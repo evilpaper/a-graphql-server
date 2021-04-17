@@ -9,6 +9,7 @@ const {
   GraphQLNonNull,
   GraphQLInputObjectType,
 } = require("graphql");
+const { getArgumentValues } = require("graphql/execution/values");
 
 const app = express();
 
@@ -64,6 +65,18 @@ const RootQueryType = new GraphQLObjectType({
   name: "Query",
   description: "Our Root query",
   fields: () => ({
+    book: {
+      type: BookType,
+      description: "A book",
+      args: {
+        id: { type: GraphQLInt },
+        name: { type: GraphQLString },
+      },
+      resolve: (parent, args) => {
+        if (args.id) return books.find((book) => book.id === args.id);
+        if (args.name) return books.find((book) => book.name === args.name);
+      },
+    },
     books: {
       type: new GraphQLList(BookType),
       description: "A list of books",
